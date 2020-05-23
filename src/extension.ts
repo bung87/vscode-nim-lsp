@@ -10,6 +10,7 @@ import {
 } from 'vscode-languageclient';
 
 import { showNimVer } from './nimStatus';
+import {runFile} from './run';
 // import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
@@ -41,7 +42,6 @@ async function start(context: any, _: ExecutableInfo) {
     detached: false,
     shell: false,
   };
-  console.log(serverModule);
 
   const serverOptions: ServerOptions = {
     run: { command: serverModule, args: args, options: options },
@@ -67,20 +67,7 @@ async function start(context: any, _: ExecutableInfo) {
 
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions);
-
-  client.onDidChangeState((e) => {
-    console.log(e);
-  });
-
-  client.onReady().then((x) => {
-    const editor = vscode.window.activeTextEditor;
-    if (editor) {
-      client.sendNotification('textDocument/didSave', {
-        textDocument: { uri: editor.document.uri.toString() },
-      });
-    }
-  });
-
+ 
   context.subscriptions.push(
     vscode.languages.registerDocumentRangeFormattingEditProvider('nim', {
       provideDocumentRangeFormattingEdits: (document, range, options, token) => {
@@ -109,7 +96,7 @@ async function start(context: any, _: ExecutableInfo) {
 }
 
 export async function activate(context: any) {
-  // vscode.commands.registerCommand('nim.run.file', runFile);
+  vscode.commands.registerCommand('nim.run.file', runFile);
   //   vscode.commands.registerCommand('nim.setSuggester', setNimSuggester);
 
   let binInfo = await getExecutableInfo('nimlsp');
