@@ -58,7 +58,7 @@ export function showNimProgress(message: string) {
 export function showNimVer(info: ExecutableInfo) {
   nimVerEntry = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
   nimVerEntry.text = `${info.name} ${info.version}`;
-  nimVerEntry.command = 'nim.setSuggester';
+  // nimVerEntry.command = 'nim.setSuggester';
   nimVerEntry.tooltip = info.path;
   nimVerEntry.show();
 }

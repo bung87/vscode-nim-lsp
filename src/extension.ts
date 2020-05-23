@@ -1,4 +1,4 @@
-import { workspace } from 'vscode';
+import { workspace, DocumentSelector } from 'vscode';
 import vscode = require('vscode');
 import {
   LanguageClient,
@@ -17,7 +17,7 @@ import { ExecutableInfo } from './interfaces';
 import { getExecutableInfo, getBinPath } from './extensionUtils';
 
 // var terminal: vscode.Terminal;
-
+const nimMode: DocumentSelector = { scheme: 'file', language: 'nim' };
 export var client: LanguageClient;
 
 async function start(context: any, _: ExecutableInfo) {
@@ -51,7 +51,8 @@ async function start(context: any, _: ExecutableInfo) {
   // Options to control the language client
   let clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
-    documentSelector: [{ language: 'nim', scheme: 'file' }],
+    // @ts-ignore
+    documentSelector: nimMode,
     diagnosticCollectionName: 'nim',
     synchronize: {
       // Notify the server about file changes to '.clientrc files contained in the workspace
@@ -66,27 +67,23 @@ async function start(context: any, _: ExecutableInfo) {
   };
 
   // Create the language client and start the client.
-  client = new LanguageClient('nim', 'nim', serverOptions, clientOptions);
+  client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
 
   context.subscriptions.push(
-    vscode.languages.registerDocumentRangeFormattingEditProvider('nim', {
+    vscode.languages.registerDocumentRangeFormattingEditProvider(nimMode, {
       provideDocumentRangeFormattingEdits: (document, range, options, token) => {
         const params: DocumentRangeFormattingParams = {
           textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
           range: client.code2ProtocolConverter.asRange(range),
           options: client.code2ProtocolConverter.asFormattingOptions(options),
         };
-        return client.sendRequest(DocumentRangeFormattingRequest.type, params, token).then(
-          (items: any) => {
-            console.log(items);
-            return client.protocol2CodeConverter.asTextEdits(items);
-          },
-          (error: Error) => {
+        return client
+          .sendRequest(DocumentRangeFormattingRequest.type, params, token)
+          .then(client.protocol2CodeConverter.asTextEdits, (error: Error) => {
             console.log(error);
             client.logFailedRequest(DocumentRangeFormattingRequest.type, error);
             return Promise.resolve([]);
-          },
-        );
+          });
       },
     }),
   );
