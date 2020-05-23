@@ -1,38 +1,38 @@
 {
-	"name": "nim",
-	"displayName": "vscode-nim-extension",
-	"description": "",
-	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.30.0"
-	},
-	"categories": [
-		"Other"
-	],
-	
-	"main": "./out/extension.js",
-	"scripts": {
-		"vscode:prepublish": "yarn run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "yarn run compile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-		"@types/bluebird": "^3.5.25",
-		"@types/mocha": "^2.2.42",
-		"@types/node": "^8.10.25",
-		"tslint": "^5.8.0",
-		"typescript": "^3.1.4",
-		"vscode": "^1.1.25"
-	},
-	"dependencies": {
-		
-		"bluebird": "^3.5.3",
-		"lstat": "^1.0.0",
-		"vscode-languageclient": "^5.2.1"
-	},
-	"activationEvents": [
+    "name": "nim",
+    "displayName": "vscode-nim-extension",
+    "description": "",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./out/extension.js",
+    "scripts": {
+        "format": "prettier --print-width 100 --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma all",
+        "lint": "tslint -p ./ --fix",
+        "vscode:prepublish": "yarn run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/bluebird": "^3.5.25",
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^14.0.5",
+        "@types/vscode": "^1.45.1",
+        "prettier": "^2.0.5",
+        "tslint": "^5.8.0",
+        "typescript": "^3.1.4",
+        "vscode": "^1.1.25"
+    },
+    "dependencies": {
+        "bluebird": "^3.5.3",
+        "vscode-languageclient": "^5.2.1"
+    },
+    "activationEvents": [
         "onLanguage:nim",
         "onLanguage:nimcfg",
         "onLanguage:nimble",
@@ -50,10 +50,7 @@
                     "nim"
                 ],
                 "extensions": [
-                    ".nim",
-                    ".nims",
-                    "nim.cfg",
-                    ".nim.cfg"
+                    ".nim"
                 ],
                 "configuration": "./nimcfg.json"
             },
@@ -152,7 +149,7 @@
                     "type": "string",
                     "default": "",
                     "description": "Optional license text that will be inserted on nim file creation."
-				}
+                }
             }
         },
         "snippets": [

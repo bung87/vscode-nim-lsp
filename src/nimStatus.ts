@@ -2,7 +2,7 @@
 
 import { NIM_MODE } from './nimMode';
 import * as vscode from 'vscode';
-import {ExecutableInfo} from './interfaces';
+import { ExecutableInfo } from './interfaces';
 
 var statusBarEntry: vscode.StatusBarItem;
 var progressBarEntry: vscode.StatusBarItem;
@@ -34,7 +34,10 @@ export function hideNimProgress() {
 }
 
 export function showNimStatus(message: string, command: string, tooltip?: string) {
-  statusBarEntry = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Number.MIN_VALUE);
+  statusBarEntry = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    Number.MIN_VALUE,
+  );
   statusBarEntry.text = message;
   statusBarEntry.command = command;
   statusBarEntry.color = 'yellow';
@@ -43,13 +46,16 @@ export function showNimStatus(message: string, command: string, tooltip?: string
 }
 
 export function showNimProgress(message: string) {
-  progressBarEntry = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, Number.MIN_VALUE);
+  progressBarEntry = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    Number.MIN_VALUE,
+  );
   progressBarEntry.text = message;
   progressBarEntry.tooltip = message;
   progressBarEntry.show();
 }
 
-export function showNimVer(info:ExecutableInfo) {
+export function showNimVer(info: ExecutableInfo) {
   nimVerEntry = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
   nimVerEntry.text = `${info.name} ${info.version}`;
   nimVerEntry.command = 'nim.setSuggester';
@@ -57,7 +63,6 @@ export function showNimVer(info:ExecutableInfo) {
   nimVerEntry.show();
 }
 
-
 export function updateNimProgress(message: string) {
-    progressBarEntry.text = message;
+  progressBarEntry.text = message;
 }

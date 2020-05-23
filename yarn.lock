@@ -10,9 +10,15 @@
   version "2.2.48"
   resolved "http://r.cnpmjs.org/@types/mocha/download/@types/mocha-2.2.48.tgz#3523b126a0b049482e1c3c11877460f76622ffab"
 
-"@types/node@^8.10.25":
-  version "8.10.39"
-  resolved "http://r.cnpmjs.org/@types/node/download/@types/node-8.10.39.tgz#e7e87ad00364dd7bc485c940926345b8ec1a26ca"
+"@types/node@^14.0.5":
+  version "14.0.5"
+  resolved "http://r.cnpmjs.org/@types/node/download/@types/node-14.0.5.tgz#3d03acd3b3414cf67faf999aed11682ed121f22b"
+  integrity sha1-PQOs07NBTPZ/r5ma7RFoLtEh8is=
+
+"@types/vscode@^1.45.1":
+  version "1.45.1"
+  resolved "http://r.cnpmjs.org/@types/vscode/download/@types/vscode-1.45.1.tgz#672fb8c2cc33cf14cd4d3bdaa19bb294fe2b2706"
+  integrity sha1-Zy+4wswzzxTNTTvaoZuylP4rJwY=
 
 ajv@^6.5.5:
   version "6.7.0"
@@ -748,10 +754,6 @@ lead@^1.0.0:
   dependencies:
     flush-write-stream "^1.0.2"
 
-lstat@^1.0.0:
-  version "1.0.0"
-  resolved "http://r.cnpmjs.org/lstat/download/lstat-1.0.0.tgz#647d228465a18c986a198276631e8355955b2146"
-
 map-stream@0.0.7:
   version "0.0.7"
   resolved "http://r.cnpmjs.org/map-stream/download/map-stream-0.0.7.tgz#8a1f07896d82b10926bd3744a2420009f88974a8"
@@ -897,6 +899,11 @@ plugin-error@^0.1.2:
     arr-diff "^1.0.1"
     arr-union "^2.0.1"
     extend-shallow "^1.1.2"
+
+prettier@^2.0.5:
+  version "2.0.5"
+  resolved "http://r.cnpmjs.org/prettier/download/prettier-2.0.5.tgz#d6d56282455243f2f92cc1716692c08aa31522d4"
+  integrity sha1-1tVigkVSQ/L5LMFxZpLAiqMVItQ=
 
 process-nextick-args@^2.0.0, process-nextick-args@~2.0.0:
   version "2.0.0"
