@@ -71,7 +71,7 @@ async function start(context: any, _: ExecutableInfo) {
 
   context.subscriptions.push(
     vscode.languages.registerDocumentRangeFormattingEditProvider(nimMode, {
-      provideDocumentRangeFormattingEdits: (document, range, options, token) => {
+      provideDocumentRangeFormattingEdits: (document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions, token: vscode.CancellationToken | undefined) => {
         const params: DocumentRangeFormattingParams = {
           textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
           range: client.code2ProtocolConverter.asRange(range),

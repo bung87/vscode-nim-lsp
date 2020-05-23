@@ -3,7 +3,6 @@ import { ExecutableInfo } from './interfaces';
 import fs = require('fs');
 import path = require('path');
 import cp = require('child_process');
-import bluebird = require('bluebird');
 import util = require('util');
 const lstat = util.promisify(fs.lstat);
 
@@ -59,58 +58,39 @@ export function readlink(link: string): string {
 
 export async function getBinPath(tool: string): Promise<string> {
   if (_pathesCache[tool]) {
-    return Promise.resolve(_pathesCache[tool]);
+    return _pathesCache[tool];
   }
   if (process.env['PATH']) {
-    if (process.platform !== 'win32') {
-      var quikePath = '';
-      try {
-        quikePath = path.normalize(cp.execSync(`which ${tool}`).toString().trim());
-      } catch (e) {
-        console.error(e);
-      }
-      if (quikePath) {
-        _pathesCache[tool] = path.normalize(quikePath);
-        return Promise.resolve(quikePath);
-      }
-    }
-    var pathparts = process.env.PATH.split(path.delimiter)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .reverse();
-    if (process.platform !== 'win32') {
-      pathparts = pathparts.filter((x) => x.indexOf('/sbin') === -1);
-    }
-    let pathes = pathparts
+    // add support for choosenim
+    process.env['PATH'] =
+      process.env['PATH'] + (<any>path).delimiter + process.env['HOME'] + '/.nimble/bin';
+    var pathparts = (<string>process.env.PATH).split((<any>path).delimiter);
+    _pathesCache[tool] = pathparts
       .map((dir) => path.join(dir, correctBinname(tool)))
-      .filter((x) => fs.existsSync(x));
-    let promises = bluebird.map(pathes, (x) => promiseSymbolLink(x));
-    let anyLink = await promises.any().catch((e) => {
-      console.error(e);
-    });
-    let msg = util.format(notInPathError, tool);
-    if (typeof anyLink !== 'undefined') {
-      if (anyLink.type === 'link') {
-        _pathesCache[tool] = anyLink.path;
-      } else {
-        return Promise.resolve(anyLink.path);
-      }
-    } else {
-      // vscode.window.showInformationMessage(msg);
-      // return Promise.reject(msg)
-    }
+      .filter((candidate) => fs.existsSync(candidate))[0];
     if (process.platform !== 'win32') {
       try {
-        let nimPath = readlink(_pathesCache[tool]);
-        _pathesCache[tool] = nimPath;
+        let nimPath;
+        if (process.platform === 'darwin') {
+          nimPath = cp.execFileSync('readlink', [_pathesCache[tool]]).toString().trim();
+          if (nimPath.length > 0 && !path.isAbsolute(nimPath)) {
+            nimPath = path.normalize(path.join(path.dirname(_pathesCache[tool]), nimPath));
+          }
+        } else if (process.platform === 'linux') {
+          nimPath = cp.execFileSync('readlink', ['-f', _pathesCache[tool]]).toString().trim();
+        } else {
+          nimPath = cp.execFileSync('readlink', [_pathesCache[tool]]).toString().trim();
+        }
+
+        if (nimPath.length > 0) {
+          _pathesCache[tool] = nimPath;
+        }
       } catch (e) {
-        console.error(e);
-        vscode.window.showErrorMessage(msg);
-        return Promise.reject();
         // ignore exception
       }
     }
   }
-  return Promise.resolve(_pathesCache[tool]);
+  return _pathesCache[tool];
 }
 
 export function correctBinname(binname: string): string {
