@@ -2,12 +2,12 @@
     "name": "nim",
     "displayName": "vscode-nim-extension",
     "description": "",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "publisher": "bung87",
     "engines": {
         "vscode": "^1.45.1"
     },
-    "repository":{
+    "repository": {
         "type": "git",
         "url": "https://github.com/bung87/vscode-nim-extension"
     },
