@@ -28,7 +28,7 @@ export function runFile() {
       let outputDirConfig = vscode.workspace.getConfiguration('nim')['runOutputDirectory'];
       var outputParams = '';
       if (!!outputDirConfig) {
-        if (vscode.workspace.workspaceFolders) {
+        if (!vscode.workspace.workspaceFolders) {
           return;
         }
         // @ts-ignore
