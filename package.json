@@ -7,6 +7,10 @@
     "engines": {
         "vscode": "^1.45.1"
     },
+    "repository":{
+        "type": "git",
+        "url": "https://github.com/bung87/vscode-nim-extension"
+    },
     "categories": [
         "Other"
     ],
