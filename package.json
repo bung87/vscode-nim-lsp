@@ -1,6 +1,6 @@
 {
     "name": "vscode-nim-lsp",
-    "displayName": "vscode-nim-extension",
+    "displayName": "vscode-nim-lsp",
     "description": "",
     "version": "0.0.2",
     "publisher": "bung87",
