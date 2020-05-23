@@ -95,6 +95,9 @@ export async function getBinPath(tool: string): Promise<string> {
 
 export function correctBinname(binname: string): string {
   if (process.platform === 'win32') {
+    if(binname.endsWith(".exe")){
+      return binname;
+    }
     return binname + '.exe';
   } else {
     return binname;
