@@ -10,7 +10,7 @@ import {
 } from 'vscode-languageclient';
 
 import { showNimVer } from './nimStatus';
-import {runFile} from './run';
+import { runFile } from './run';
 // import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
@@ -67,7 +67,7 @@ async function start(context: any, _: ExecutableInfo) {
 
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions);
- 
+
   context.subscriptions.push(
     vscode.languages.registerDocumentRangeFormattingEditProvider('nim', {
       provideDocumentRangeFormattingEdits: (document, range, options, token) => {
