@@ -1,5 +1,5 @@
 {
-    "name": "nim",
+    "name": "vscode-nim-lsp",
     "displayName": "vscode-nim-extension",
     "description": "",
     "version": "0.0.2",
