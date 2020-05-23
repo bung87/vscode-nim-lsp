@@ -5,7 +5,7 @@ vscode nim extension using LSP server write in nim
 ## Features
 
 * definition  
-* executeCommand  
+* executeCommand  <kbd>F6</kbd>
 * hover  
 * references  
 * syntax Highlight  

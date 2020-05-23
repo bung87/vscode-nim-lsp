@@ -43,8 +43,7 @@
         "onLanguage:nimble",
         "onCommand:nim.build",
         "onCommand:nim.run",
-        "onCommand:nim.runTest",
-        "onCommand:nim.setSuggester"
+        "onCommand:nim.runTest"
     ],
     "contributes": {
         "languages": [
@@ -87,10 +86,6 @@
             {
                 "command": "nim.run.file",
                 "title": "Nim: Run selected file"
-            },
-            {
-                "command": "nim.setSuggester",
-                "title": "set Nim Suggester"
             }
         ],
         "menus": {
