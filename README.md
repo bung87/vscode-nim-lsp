@@ -1,4 +1,4 @@
-# vscode-nim-extension 
+# vscode-nim-lsp 
 
 vscode nim extension using LSP server write in nim
 
