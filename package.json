@@ -2,7 +2,7 @@
     "name": "vscode-nim-lsp",
     "displayName": "vscode-nim-lsp",
     "description": "",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "publisher": "bung87",
     "engines": {
         "vscode": "^1.45.1"
