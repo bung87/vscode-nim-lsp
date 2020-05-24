@@ -4,6 +4,7 @@ import fs = require('fs');
 import path = require('path');
 import cp = require('child_process');
 import util = require('util');
+import bluebird = require('bluebird');
 const lstat = util.promisify(fs.lstat);
 
 const notInPathError = 'No %s binary could be found in PATH environment variable';
@@ -58,16 +59,56 @@ export function readlink(link: string): string {
 
 export async function getBinPath(tool: string): Promise<string> {
   if (_pathesCache[tool]) {
-    return _pathesCache[tool];
+    return Promise.resolve(_pathesCache[tool]);
   }
   if (process.env['PATH']) {
-    // add support for choosenim
-    process.env['PATH'] =
-      process.env['PATH'] + (<any>path).delimiter + process.env['HOME'] + '/.nimble/bin';
-    var pathparts = (<string>process.env.PATH).split((<any>path).delimiter);
-    _pathesCache[tool] = pathparts
-      .map((dir) => path.join(dir, correctBinname(tool)))
-      .filter((candidate) => fs.existsSync(candidate))[0];
+    var quikePath = '';
+    try {
+      quikePath = path.normalize(cp.execSync(`which ${tool}`).toString().trim());
+    } catch (e) {
+      console.error(e);
+    }
+    if (quikePath) {
+      _pathesCache[tool] = path.normalize(quikePath);
+      return Promise.resolve(quikePath);
+    }
+    var pathparts = (<string>process.env.PATH)
+      .split((<any>path).delimiter)
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .reverse();
+    // pathparts = pathparts.filter((x) => x.indexOf('/sbin') === -1);
+    // pathparts = pathparts.filter((x) => {
+    //   if (x.match('([a-zA-Z0-9_-]+)+[0-9.]+') || x.match('.[a-zA-Z]+')) {
+    //     return x.toLowerCase().indexOf('nim') !== -1;
+    //   } else {
+    //     return true;
+    //   }
+    // });
+    let pathes: string[] = [];
+    if (process.platform === 'win32') {
+      pathes = [
+        ...pathparts.map((dir) => path.join(dir, `${tool}.exe`)),
+        ...pathparts.map((dir) => path.join(dir, `${tool}.cmd`)),
+      ];
+    } else {
+      pathes = pathparts.map((dir) => path.join(dir, tool));
+    }
+    let promises = bluebird.map(pathes, (x) => promiseSymbolLink(x));
+    let anyFile = await promises.any().catch((e) => {
+      console.error(e);
+    });
+    let msg = `No ${tool} binary could be found in PATH environment variable`;
+    if (typeof anyFile !== 'undefined') {
+      if (anyFile.type === 'link') {
+        _pathesCache[tool] = anyFile.path;
+      } else {
+        _pathesCache[tool] = anyFile.path;
+        return Promise.resolve(anyFile.path);
+      }
+    } else {
+      // vscode.window.showInformationMessage(msg);
+      // return Promise.reject(msg)
+    }
     if (process.platform !== 'win32') {
       try {
         let nimPath;
@@ -86,22 +127,14 @@ export async function getBinPath(tool: string): Promise<string> {
           _pathesCache[tool] = nimPath;
         }
       } catch (e) {
+        console.error(e);
+        vscode.window.showErrorMessage(msg);
+        return Promise.reject();
         // ignore exception
       }
     }
   }
-  return _pathesCache[tool];
-}
-
-export function correctBinname(binname: string): string {
-  if (process.platform === 'win32') {
-    if(binname.endsWith(".exe")){
-      return binname;
-    }
-    return binname + '.exe';
-  } else {
-    return binname;
-  }
+  return Promise.resolve(_pathesCache[tool]);
 }
 
 export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
@@ -112,11 +145,17 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
   if (configuredExePath) {
     exePath = configuredExePath;
   } else {
-    let binPath = await getBinPath(exe);
-    exePath = path.resolve(path.dirname(binPath), correctBinname(exe));
+    exePath = await getBinPath(exe);
   }
   if (fs.existsSync(exePath)) {
-    let versionOutput = cp.spawnSync(exePath, ['--version']).output.toString();
+    const output = cp.spawnSync(exePath, ['--version']).output;
+    if (!output) {
+      return Promise.resolve({
+        name: exe,
+        path: exePath,
+      });
+    }
+    let versionOutput = output.toString();
     let versionArgs = /(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/g.exec(versionOutput);
     console.log(versionArgs);
     if (versionArgs) {

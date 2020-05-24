@@ -1,5 +1,6 @@
 import { workspace, DocumentSelector } from 'vscode';
 import vscode = require('vscode');
+import { MODE } from './mode';
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -9,15 +10,15 @@ import {
   DocumentRangeFormattingRequest,
 } from 'vscode-languageclient';
 
-import { showNimVer } from './nimStatus';
+import { showNimVer } from './status';
 import { runFile } from './run';
 // import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
-import { getExecutableInfo, getBinPath } from './extensionUtils';
+import { getExecutableInfo, getBinPath } from './utils';
 
 // var terminal: vscode.Terminal;
-const nimMode: DocumentSelector = { scheme: 'file', language: 'nim' };
+
 export var client: LanguageClient;
 
 async function start(context: any, _: ExecutableInfo) {
@@ -70,8 +71,13 @@ async function start(context: any, _: ExecutableInfo) {
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
 
   context.subscriptions.push(
-    vscode.languages.registerDocumentRangeFormattingEditProvider(nimMode, {
-      provideDocumentRangeFormattingEdits: (document: vscode.TextDocument, range: vscode.Range, options: vscode.FormattingOptions, token: vscode.CancellationToken | undefined) => {
+    vscode.languages.registerDocumentRangeFormattingEditProvider(MODE, {
+      provideDocumentRangeFormattingEdits: (
+        document: vscode.TextDocument,
+        range: vscode.Range,
+        options: vscode.FormattingOptions,
+        token: vscode.CancellationToken | undefined,
+      ) => {
         const params: DocumentRangeFormattingParams = {
           textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
           range: client.code2ProtocolConverter.asRange(range),
@@ -80,7 +86,6 @@ async function start(context: any, _: ExecutableInfo) {
         return client
           .sendRequest(DocumentRangeFormattingRequest.type, params, token)
           .then(client.protocol2CodeConverter.asTextEdits, (error: Error) => {
-            console.log(error);
             client.logFailedRequest(DocumentRangeFormattingRequest.type, error);
             return Promise.resolve([]);
           });

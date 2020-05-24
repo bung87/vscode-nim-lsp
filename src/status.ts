@@ -1,6 +1,6 @@
 'use strict';
 
-import { NIM_MODE } from './nimMode';
+import { MODE } from './mode';
 import * as vscode from 'vscode';
 import { ExecutableInfo } from './interfaces';
 
@@ -17,7 +17,7 @@ export function showHideStatus() {
     nimVerEntry.hide();
     return;
   }
-  if (vscode.languages.match(NIM_MODE, vscode.window.activeTextEditor.document)) {
+  if (vscode.languages.match(MODE, vscode.window.activeTextEditor.document)) {
     statusBarEntry.show();
     nimVerEntry.show();
     return;

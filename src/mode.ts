@@ -7,4 +7,4 @@
 
 import * as vscode from 'vscode';
 
-export const NIM_MODE: vscode.DocumentFilter = { language: 'nim', scheme: 'file' };
+export const MODE: vscode.DocumentFilter = { language: 'nim', scheme: 'file' };
