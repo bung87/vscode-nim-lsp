@@ -111,18 +111,7 @@ export async function getBinPath(tool: string): Promise<string> {
     }
     if (process.platform !== 'win32') {
       try {
-        let nimPath;
-        if (process.platform === 'darwin') {
-          nimPath = cp.execFileSync('readlink', [_pathesCache[tool]]).toString().trim();
-          if (nimPath.length > 0 && !path.isAbsolute(nimPath)) {
-            nimPath = path.normalize(path.join(path.dirname(_pathesCache[tool]), nimPath));
-          }
-        } else if (process.platform === 'linux') {
-          nimPath = cp.execFileSync('readlink', ['-f', _pathesCache[tool]]).toString().trim();
-        } else {
-          nimPath = cp.execFileSync('readlink', [_pathesCache[tool]]).toString().trim();
-        }
-
+        let nimPath = readlink(_pathesCache[tool]);
         if (nimPath.length > 0) {
           _pathesCache[tool] = nimPath;
         }
