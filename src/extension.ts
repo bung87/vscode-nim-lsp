@@ -53,7 +53,7 @@ async function start(context: any, _: ExecutableInfo) {
   let clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
     // @ts-ignore
-    documentSelector: nimMode,
+    documentSelector: MODE,
     diagnosticCollectionName: 'nim',
     synchronize: {
       // Notify the server about file changes to '.clientrc files contained in the workspace
