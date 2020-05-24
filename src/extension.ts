@@ -1,4 +1,4 @@
-import { workspace, DocumentSelector } from 'vscode';
+import { workspace } from 'vscode';
 import vscode = require('vscode');
 import { MODE } from './mode';
 import {
