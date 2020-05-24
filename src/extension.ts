@@ -6,8 +6,10 @@ import {
   LanguageClientOptions,
   ServerOptions,
   ExecutableOptions,
+  HoverParams,
   DocumentRangeFormattingParams,
   DocumentRangeFormattingRequest,
+  HoverRequest,
 } from 'vscode-languageclient';
 
 import { showNimVer } from './status';
@@ -59,11 +61,33 @@ async function start(context: any, _: ExecutableInfo) {
       // Notify the server about file changes to '.clientrc files contained in the workspace
       fileEvents: workspace.createFileSystemWatcher('{**/*.nim,**/.nimble}'),
     },
-    initializationOptions: {
-      documentFormattingProvider: true,
-      documentRangeFormattingProvider: true,
-      executeCommandProvider: true,
+    middleware: {
+      provideHover: (
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken,
+      ) => {
+        const start = document.getWordRangeAtPosition(position)?.start || position;
+        const params: HoverParams = {
+          textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
+          position: client.code2ProtocolConverter.asPosition(start),
+        };
+        return client
+          .sendRequest(HoverRequest.type, params, token)
+          .then(client.protocol2CodeConverter.asHover, (error: Error) => {
+            client.logFailedRequest(HoverRequest.type, error);
+            return Promise.reject();
+          });
+      },
     },
+    // initializationOptions: {
+    //   ServerCapabilities:{
+    //     documentFormattingProvider: true,
+    //     documentRangeFormattingProvider: true,
+    //     executeCommandProvider: true,
+    //     hoverProvider:false,
+    //   }
+    // },
     workspaceFolder: folder,
   };
 

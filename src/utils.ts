@@ -58,8 +58,7 @@ export async function getBinPath(tool: string): Promise<string> {
     return Promise.resolve(_pathesCache[tool]);
   }
   if (process.env['PATH']) {
-    var pathparts = (<string>process.env.PATH)
-      .split((<any>path).delimiter)
+    var pathparts = process.env.PATH.split(path.delimiter)
       .filter((value, index, self) => self.indexOf(value) === index)
       .reverse();
     // pathparts = pathparts.filter((x) => x.indexOf('/sbin') === -1);
