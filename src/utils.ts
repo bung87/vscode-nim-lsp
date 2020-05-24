@@ -15,7 +15,6 @@ export function promiseSymbolLink(path: string): Promise<{ path: string; type: s
     try {
       lstat(path)
         .then((stat: { isSymbolicLink: () => any; isFile: () => any }) => {
-          console.log(stat,stat.isSymbolicLink(),stat.isFile(),path)
           if (stat.isSymbolicLink()) {
             resolve({ path: path, type: 'link' });
           } else if (stat.isFile()) {
@@ -80,7 +79,7 @@ export async function getBinPath(tool: string): Promise<string> {
     } else {
       pathes = pathparts.map((dir) => path.join(dir, tool));
     }
-    let promises = pathes.filter( (x) => fs.existsSync(x) ).map( promiseSymbolLink);
+    let promises = pathes.filter((x) => fs.existsSync(x)).map(promiseSymbolLink);
     let anyFile = await bluebird.any(promises).catch((e) => {
       console.error(e);
     });
@@ -123,7 +122,7 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
   } else {
     exePath = await getBinPath(exe);
   }
- 
+
   if (exePath && fs.existsSync(exePath)) {
     const output = cp.spawnSync(exePath, ['--version']).output;
     if (!output) {
@@ -134,7 +133,6 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
     }
     let versionOutput = output.toString();
     let versionArgs = /(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/g.exec(versionOutput);
-    console.log(versionArgs);
     if (versionArgs) {
       exeVersion = versionArgs[0];
     }
