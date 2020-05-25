@@ -1,6 +1,7 @@
 import { workspace } from 'vscode';
 import vscode = require('vscode');
 import { MODE } from './mode';
+const rst2mdown = require('rst2mdown');
 import {
   LanguageClient,
   LanguageClientOptions,
@@ -10,6 +11,10 @@ import {
   DocumentRangeFormattingParams,
   DocumentRangeFormattingRequest,
   HoverRequest,
+  Hover,
+  // MarkedString,
+  // MarkupContent,
+  MarkupKind,
 } from 'vscode-languageclient';
 
 import { showNimVer } from './status';
@@ -22,6 +27,20 @@ import { getExecutableInfo, getBinPath } from './utils';
 // var terminal: vscode.Terminal;
 
 export var client: LanguageClient;
+function isObject(val: any): boolean {
+  if (val === null) {
+    return false;
+  }
+  return typeof val === 'function' || typeof val === 'object';
+}
+
+// interface MarkedStringObj {
+//   language: string;
+// }
+
+// function isMarkedStringObj(object: any): object is MarkedStringObj {
+//   return 'language' in object;
+// }
 
 async function start(context: any, _: ExecutableInfo) {
   let serverModule = await getBinPath('nimlsp');
@@ -72,12 +91,65 @@ async function start(context: any, _: ExecutableInfo) {
           textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
           position: client.code2ProtocolConverter.asPosition(start),
         };
-        return client
-          .sendRequest(HoverRequest.type, params, token)
-          .then(client.protocol2CodeConverter.asHover, (error: Error) => {
+        // export interface MarkupContent {
+        //   /**
+        //    * The type of the Markup
+        //    */
+        //   kind: MarkupKind;
+
+        //   /**
+        //    * The content itself
+        //    */
+        //   value: string;
+        // }
+        // type MarkedString = string | { language: string; value: string };
+        return client.sendRequest(HoverRequest.type, params, token).then(
+          (hover: Hover | null) => {
+            console.log(23, hover);
+            if (hover) {
+              let origin = client.protocol2CodeConverter.asHover(hover);
+              console.log(origin.contents);
+              if (Array.isArray(origin.contents)) {
+                let newHover = { contents: origin.contents, orange: origin.range };
+                for (const item of newHover.contents) {
+                  // if (MarkedString.is(item)) {
+                  // if (isMarkedStringObj(item)) {
+                  // if (item.language === '') {
+                  // @ts-ignore
+                  let mdown = rst2mdown(item.value);
+                  newHover.contents = {
+                    // @ts-ignore
+                    kind: MarkupKind.Markdown,
+                    value: mdown,
+                  };
+
+                  return newHover;
+                  // }
+                  // }
+                  // }
+                }
+              } else if (isObject(origin.contents)) {
+                let newHover = { contents: origin.contents, orange: origin.range };
+                // @ts-ignore
+                let mdown = rst2mdown(origin.contents.value);
+                newHover.contents = {
+                  // @ts-ignore
+                  kind: MarkupKind.Markdown,
+                  // @ts-ignore
+                  value: mdown,
+                };
+                console.log(898, newHover, 089);
+                return newHover;
+              }
+            }
+
+            return client.protocol2CodeConverter.asHover(hover);
+          },
+          (error: Error) => {
             client.logFailedRequest(HoverRequest.type, error);
             return Promise.reject();
-          });
+          },
+        );
       },
     },
     // initializationOptions: {
