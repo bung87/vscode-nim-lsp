@@ -105,40 +105,50 @@ async function start(context: any, _: ExecutableInfo) {
         // type MarkedString = string | { language: string; value: string };
         return client.sendRequest(HoverRequest.type, params, token).then(
           (hover: Hover | null) => {
-            console.log(23, hover);
+            console.log(23, isObject(hover?.contents), hover);
             if (hover) {
-              let origin = client.protocol2CodeConverter.asHover(hover);
-              console.log(origin.contents);
-              if (Array.isArray(origin.contents)) {
-                let newHover = { contents: origin.contents, orange: origin.range };
-                for (const item of newHover.contents) {
+              // let origin = client.protocol2CodeConverter.asHover(hover);
+              // console.log(origin.contents);
+              var mdown = '';
+              if (Array.isArray(hover.contents)) {
+                console.log('isArray');
+                let newHover = new vscode.Hover(hover.contents);
+                hover.contents.forEach((item: any, index: number) => {
                   // if (MarkedString.is(item)) {
                   // if (isMarkedStringObj(item)) {
                   // if (item.language === '') {
                   // @ts-ignore
-                  let mdown = rst2mdown(item.value);
-                  newHover.contents = {
-                    // @ts-ignore
-                    kind: MarkupKind.Markdown,
-                    value: mdown,
-                  };
+                  console.log('item value', item.value);
+                  // @ts-ignore
+                  if (index === 0) {
+                    mdown += rst2mdown('``` nim\n' + item.value + '```');
+                  } else {
+                    mdown += item.value;
+                  }
 
-                  return newHover;
                   // }
                   // }
                   // }
-                }
-              } else if (isObject(origin.contents)) {
-                let newHover = { contents: origin.contents, orange: origin.range };
+                });
+                newHover.contents = {
+                  // @ts-ignore
+                  kind: MarkupKind.Markdown,
+                  value: mdown,
+                };
+
+                return newHover;
+              } else if (isObject(hover.contents)) {
                 // @ts-ignore
-                let mdown = rst2mdown(origin.contents.value);
+                let newHover = new vscode.Hover(hover.contents, hover.range);
+                // @ts-ignore
+                let mdown = rst2mdown(hover.contents.value);
                 newHover.contents = {
                   // @ts-ignore
                   kind: MarkupKind.Markdown,
                   // @ts-ignore
                   value: mdown,
                 };
-                console.log(898, newHover, 089);
+                console.log(898, newHover, 89);
                 return newHover;
               }
             }
