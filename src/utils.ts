@@ -4,11 +4,18 @@ import fs = require('fs');
 import path = require('path');
 import cp = require('child_process');
 import util = require('util');
+import os = require('os');
 import bluebird = require('bluebird');
 const lstat = util.promisify(fs.lstat);
 
 const notInPathError = 'No %s binary could be found in PATH environment variable';
 let _pathesCache: { [tool: string]: string } = {};
+
+export function getDirtyFile(document: vscode.TextDocument): string {
+  var dirtyFilePath = path.normalize(path.join(os.tmpdir(), 'vscodenimdirty.nim'));
+  fs.writeFileSync(dirtyFilePath, document.getText());
+  return dirtyFilePath;
+}
 
 export function promiseSymbolLink(path: string): Promise<{ path: string; type: string }> {
   return new Promise<{ path: string; type: string }>((resolve, reject) => {
@@ -108,6 +115,7 @@ export async function getBinPath(tool: string): Promise<string> {
       }
     }
   }
+  console.log(_pathesCache[tool]);
   return Promise.resolve(_pathesCache[tool]);
 }
 

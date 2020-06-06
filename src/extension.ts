@@ -7,17 +7,16 @@ import {
   ServerOptions,
   ExecutableOptions,
   HoverParams,
-  DocumentRangeFormattingParams,
-  DocumentRangeFormattingRequest,
   HoverRequest,
 } from 'vscode-languageclient';
-
+import cp = require('child_process');
+import fs = require('fs');
 import { showNimVer } from './status';
 import { runFile } from './run';
 // import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
-import { getExecutableInfo, getBinPath } from './utils';
+import { getExecutableInfo, getDirtyFile, getBinPath } from './utils';
 
 // var terminal: vscode.Terminal;
 
@@ -80,13 +79,11 @@ async function start(context: any, _: ExecutableInfo) {
           });
       },
     },
-    // initializationOptions: {
-    //   ServerCapabilities:{
-    //     documentFormattingProvider: true,
-    //     documentRangeFormattingProvider: true,
-    //     executeCommandProvider: true,
-    //     hoverProvider:false,
-    //   }
+    initializationOptions: {
+      documentFormattingProvider: true,
+    },
+    // "capabilities":{
+    //   formatting:true
     // },
     workspaceFolder: folder,
   };
@@ -95,24 +92,61 @@ async function start(context: any, _: ExecutableInfo) {
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
 
   context.subscriptions.push(
-    vscode.languages.registerDocumentRangeFormattingEditProvider(MODE, {
-      provideDocumentRangeFormattingEdits: (
+    vscode.languages.registerDocumentFormattingEditProvider(MODE, {
+      provideDocumentFormattingEdits: (
         document: vscode.TextDocument,
-        range: vscode.Range,
         options: vscode.FormattingOptions,
         token: vscode.CancellationToken | undefined,
       ) => {
-        const params: DocumentRangeFormattingParams = {
-          textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
-          range: client.code2ProtocolConverter.asRange(range),
-          options: client.code2ProtocolConverter.asFormattingOptions(options),
-        };
-        return client
-          .sendRequest(DocumentRangeFormattingRequest.type, params, token)
-          .then(client.protocol2CodeConverter.asTextEdits, (error: Error) => {
-            client.logFailedRequest(DocumentRangeFormattingRequest.type, error);
-            return Promise.resolve([]);
-          });
+        return new Promise(async (resolve, reject) => {
+          if ((await getBinPath('nimpretty')) === '') {
+            vscode.window.showInformationMessage(
+              "No 'nimpretty' binary could be found in PATH environment variable",
+            );
+            resolve([]);
+          } else {
+            let file = getDirtyFile(document);
+            let tabSize = null;
+            const config = vscode.workspace.getConfiguration('');
+            try {
+              tabSize = config['nim']['editor.tabSize'];
+            } catch (e) {
+              tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
+            }
+            if (!tabSize) {
+              tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
+            }
+
+            let args = [
+              '--backup:OFF',
+              // '--maxLineLen:' + config['nimprettyMaxLineLen'],
+            ];
+            if (tabSize) {
+              args.push('--indent:' + tabSize);
+            }
+            console.log(args.concat(file));
+            let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
+              cwd: vscode.workspace.rootPath,
+            });
+
+            if (res.status !== 0) {
+              reject(res.error);
+            } else {
+              if (!fs.existsSync(file)) {
+                reject(file + ' file not found');
+              } else {
+                let content = fs.readFileSync(file, 'utf-8');
+                let range = document.validateRange(
+                  new vscode.Range(
+                    new vscode.Position(0, 0),
+                    new vscode.Position(1000000, 1000000),
+                  ),
+                );
+                resolve([vscode.TextEdit.replace(range, content)]);
+              }
+            }
+          }
+        });
       },
     }),
   );
