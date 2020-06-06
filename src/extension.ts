@@ -124,7 +124,6 @@ async function start(context: any, _: ExecutableInfo) {
             if (tabSize) {
               args.push('--indent:' + tabSize);
             }
-            console.log(args.concat(file));
             let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
               cwd: vscode.workspace.rootPath,
             });
