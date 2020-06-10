@@ -109,7 +109,7 @@ async function start(context: any, _: ExecutableInfo) {
             let tabSize = null;
             const config = vscode.workspace.getConfiguration('');
             try {
-              tabSize = config['nim']['editor.tabSize'];
+              tabSize = config['[nim]']['editor.tabSize'];
             } catch (e) {
               tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
             }
