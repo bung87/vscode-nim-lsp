@@ -17,6 +17,7 @@ import { runFile } from './run';
 
 import { ExecutableInfo } from './interfaces';
 import { getExecutableInfo, getDirtyFile, getBinPath } from './utils';
+import { checkFile } from './check';
 
 // var terminal: vscode.Terminal;
 
@@ -156,6 +157,7 @@ async function start(context: any, _: ExecutableInfo) {
 
 export async function activate(context: any) {
   vscode.commands.registerCommand('nim.run.file', runFile);
+  vscode.commands.registerCommand('nim.check.file', checkFile);
   //   vscode.commands.registerCommand('nim.setSuggester', setNimSuggester);
 
   let binInfo = await getExecutableInfo('nimlsp');

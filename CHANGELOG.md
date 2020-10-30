@@ -1,3 +1,6 @@
+# 0.0.15
+- Add check Nim file command  
+
 # 0.0.13
 - Add document formatting support using nimpretty exe  
 

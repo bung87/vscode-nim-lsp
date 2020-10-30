@@ -2,7 +2,7 @@
     "name": "vscode-nim-lsp",
     "displayName": "vscode-nim-lsp",
     "description": "",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "publisher": "bung87",
     "engines": {
         "vscode": "^1.45.1"
@@ -84,6 +84,10 @@
             {
                 "command": "nim.run.file",
                 "title": "Nim: Run selected file"
+            },
+            {
+                "command": "nim.check.file",
+                "title": "Nim: Check selected file"
             }
         ],
         "menus": {
