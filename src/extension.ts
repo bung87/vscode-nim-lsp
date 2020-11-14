@@ -9,14 +9,14 @@ import {
   HoverParams,
   HoverRequest,
 } from 'vscode-languageclient';
-import cp = require('child_process');
-import fs = require('fs');
+// import cp = require('child_process');
+// import fs = require('fs');
 import { showNimVer } from './status';
 import { runFile } from './run';
 // import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
-import { getExecutableInfo, getDirtyFile, getBinPath } from './utils';
+import { getExecutableInfo, getBinPath } from './utils';
 import { checkFile } from './check';
 
 // var terminal: vscode.Terminal;
@@ -31,12 +31,7 @@ async function start(context: any, _: ExecutableInfo) {
     return;
   }
   const resource = editor.document.uri;
-
-  const folder = workspace.getWorkspaceFolder(resource);
-  if (!folder) {
-    return;
-  }
-
+ 
   let args: string[] = [];
   // If the extension is launched in debug mode then the debug server options are used
   // Otherwise the run options are used
@@ -80,76 +75,76 @@ async function start(context: any, _: ExecutableInfo) {
           });
       },
     },
-    initializationOptions: {
-      documentFormattingProvider: true,
-    },
+    // initializationOptions: {
+    //   documentFormattingProvider: true,
+    // },
     // "capabilities":{
     //   formatting:true
     // },
-    workspaceFolder: folder,
+    workspaceFolder: workspace.getWorkspaceFolder(resource),
   };
 
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
 
-  context.subscriptions.push(
-    vscode.languages.registerDocumentFormattingEditProvider(MODE, {
-      provideDocumentFormattingEdits: (
-        document: vscode.TextDocument,
-        options: vscode.FormattingOptions,
-        token: vscode.CancellationToken | undefined,
-      ) => {
-        return new Promise(async (resolve, reject) => {
-          if ((await getBinPath('nimpretty')) === '') {
-            vscode.window.showInformationMessage(
-              "No 'nimpretty' binary could be found in PATH environment variable",
-            );
-            resolve([]);
-          } else {
-            let file = getDirtyFile(document);
-            let tabSize = null;
-            const config = vscode.workspace.getConfiguration('');
-            try {
-              tabSize = config['[nim]']['editor.tabSize'];
-            } catch (e) {
-              tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
-            }
-            if (!tabSize) {
-              tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
-            }
+  // context.subscriptions.push(
+  //   vscode.languages.registerDocumentFormattingEditProvider(MODE, {
+  //     provideDocumentFormattingEdits: (
+  //       document: vscode.TextDocument,
+  //       options: vscode.FormattingOptions,
+  //       token: vscode.CancellationToken | undefined,
+  //     ) => {
+  //       return new Promise(async (resolve, reject) => {
+  //         if ((await getBinPath('nimpretty')) === '') {
+  //           vscode.window.showInformationMessage(
+  //             "No 'nimpretty' binary could be found in PATH environment variable",
+  //           );
+  //           resolve([]);
+  //         } else {
+  //           let file = getDirtyFile(document);
+  //           let tabSize = null;
+  //           const config = vscode.workspace.getConfiguration('');
+  //           try {
+  //             tabSize = config['[nim]']['editor.tabSize'];
+  //           } catch (e) {
+  //             tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
+  //           }
+  //           if (!tabSize) {
+  //             tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
+  //           }
 
-            let args = [
-              '--backup:OFF',
-              // '--maxLineLen:' + config['nimprettyMaxLineLen'],
-            ];
-            if (tabSize) {
-              args.push('--indent:' + tabSize);
-            }
-            let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
-              cwd: vscode.workspace.rootPath,
-            });
+  //           let args = [
+  //             '--backup:OFF',
+  //             // '--maxLineLen:' + config['nimprettyMaxLineLen'],
+  //           ];
+  //           if (tabSize) {
+  //             args.push('--indent:' + tabSize);
+  //           }
+  //           let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
+  //             cwd: vscode.workspace.rootPath,
+  //           });
 
-            if (res.status !== 0) {
-              reject(res.error);
-            } else {
-              if (!fs.existsSync(file)) {
-                reject(file + ' file not found');
-              } else {
-                let content = fs.readFileSync(file, 'utf-8');
-                let range = document.validateRange(
-                  new vscode.Range(
-                    new vscode.Position(0, 0),
-                    new vscode.Position(1000000, 1000000),
-                  ),
-                );
-                resolve([vscode.TextEdit.replace(range, content)]);
-              }
-            }
-          }
-        });
-      },
-    }),
-  );
+  //           if (res.status !== 0) {
+  //             reject(res.error);
+  //           } else {
+  //             if (!fs.existsSync(file)) {
+  //               reject(file + ' file not found');
+  //             } else {
+  //               let content = fs.readFileSync(file, 'utf-8');
+  //               let range = document.validateRange(
+  //                 new vscode.Range(
+  //                   new vscode.Position(0, 0),
+  //                   new vscode.Position(1000000, 1000000),
+  //                 ),
+  //               );
+  //               resolve([vscode.TextEdit.replace(range, content)]);
+  //             }
+  //           }
+  //         }
+  //       });
+  //     },
+  //   }),
+  // );
 
   // Start the client. This will also launch the server
   context.subscriptions.push(client.start());
