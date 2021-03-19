@@ -9,17 +9,15 @@ import {
   HoverParams,
   HoverRequest,
 } from 'vscode-languageclient';
-// import cp = require('child_process');
-// import fs = require('fs');
+
 import { showNimVer } from './status';
 import { runFile } from './run';
-// import { setNimSuggester } from './nimSuggestExec';
 
 import { ExecutableInfo } from './interfaces';
 import { getExecutableInfo, getBinPath } from './utils';
 import { checkFile } from './check';
+import { formatDocument, onSave } from './formatter';
 
-// var terminal: vscode.Terminal;
 
 export var client: LanguageClient;
 
@@ -31,7 +29,7 @@ async function start(context: any, _: ExecutableInfo) {
     return;
   }
   const resource = editor.document.uri;
- 
+
   let args: string[] = [];
   // If the extension is launched in debug mode then the debug server options are used
   // Otherwise the run options are used
@@ -87,64 +85,32 @@ async function start(context: any, _: ExecutableInfo) {
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
 
-  // context.subscriptions.push(
-  //   vscode.languages.registerDocumentFormattingEditProvider(MODE, {
-  //     provideDocumentFormattingEdits: (
-  //       document: vscode.TextDocument,
-  //       options: vscode.FormattingOptions,
-  //       token: vscode.CancellationToken | undefined,
-  //     ) => {
-  //       return new Promise(async (resolve, reject) => {
-  //         if ((await getBinPath('nimpretty')) === '') {
-  //           vscode.window.showInformationMessage(
-  //             "No 'nimpretty' binary could be found in PATH environment variable",
-  //           );
-  //           resolve([]);
-  //         } else {
-  //           let file = getDirtyFile(document);
-  //           let tabSize = null;
-  //           const config = vscode.workspace.getConfiguration('');
-  //           try {
-  //             tabSize = config['[nim]']['editor.tabSize'];
-  //           } catch (e) {
-  //             tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
-  //           }
-  //           if (!tabSize) {
-  //             tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
-  //           }
+  context.subscriptions.push(
+    vscode.languages.registerDocumentFormattingEditProvider(MODE, {
+      provideDocumentFormattingEdits: (
+        document: vscode.TextDocument,
+        options: vscode.FormattingOptions,
+        token: vscode.CancellationToken | undefined,
+      ) => {
+        return new Promise(async (resolve, reject) => {
+          if ((await getBinPath('nimpretty')) === '') {
+            vscode.window.showInformationMessage(
+              "No 'nimpretty' binary could be found in PATH environment variable",
+            );
+            resolve([]);
+          } else {
+            return resolve(formatDocument(document))
+          }
+        });
+      },
+    }),
+  );
 
-  //           let args = [
-  //             '--backup:OFF',
-  //             // '--maxLineLen:' + config['nimprettyMaxLineLen'],
-  //           ];
-  //           if (tabSize) {
-  //             args.push('--indent:' + tabSize);
-  //           }
-  //           let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
-  //             cwd: vscode.workspace.rootPath,
-  //           });
-
-  //           if (res.status !== 0) {
-  //             reject(res.error);
-  //           } else {
-  //             if (!fs.existsSync(file)) {
-  //               reject(file + ' file not found');
-  //             } else {
-  //               let content = fs.readFileSync(file, 'utf-8');
-  //               let range = document.validateRange(
-  //                 new vscode.Range(
-  //                   new vscode.Position(0, 0),
-  //                   new vscode.Position(1000000, 1000000),
-  //                 ),
-  //               );
-  //               resolve([vscode.TextEdit.replace(range, content)]);
-  //             }
-  //           }
-  //         }
-  //       });
-  //     },
-  //   }),
-  // );
+  context.subscriptions.push(
+    vscode.workspace.onWillSaveTextDocument((e) => {
+      onSave(e);
+    })
+  );
 
   // Start the client. This will also launch the server
   context.subscriptions.push(client.start());
@@ -153,7 +119,6 @@ async function start(context: any, _: ExecutableInfo) {
 export async function activate(context: any) {
   vscode.commands.registerCommand('nim.run.file', runFile);
   vscode.commands.registerCommand('nim.check.file', checkFile);
-  //   vscode.commands.registerCommand('nim.setSuggester', setNimSuggester);
 
   let binInfo = await getExecutableInfo('nimlsp');
   showNimVer(binInfo);

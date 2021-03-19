@@ -1,14 +1,13 @@
 import vscode = require('vscode');
 import fs = require('fs');
-import os = require('os');
 import path = require('path');
-export function getDirtyFile(document: vscode.TextDocument): string {
-  var dirtyFilePath = path.normalize(path.join(os.tmpdir(), 'vscodenimdirty.nim'));
-  fs.writeFileSync(dirtyFilePath, document.getText());
-  return dirtyFilePath;
-}
+import { getDirtyFile } from './utils';
+import {promisify} from 'util'
+const mkdir = promisify(fs.mkdir)
+const stat = promisify(fs.stat)
+
 var terminal: vscode.Terminal;
-export function runFile() {
+export async function runFile() {
   let editor = vscode.window.activeTextEditor;
   if (editor) {
     if (!terminal) {
@@ -20,7 +19,7 @@ export function runFile() {
         'nim ' +
           vscode.workspace.getConfiguration('nim')['buildCommand'] +
           ' -r "' +
-          getDirtyFile(editor.document) +
+          await getDirtyFile(editor.document) +
           '"',
         true,
       );
@@ -43,8 +42,8 @@ export function runFile() {
         if (!pat) {
           return;
         }
-        if (!fs.existsSync(pat)) {
-          fs.mkdirSync(pat);
+        if (!stat(pat)) {
+          await mkdir(pat);
         }
         outputParams =
           ' --out:"' +

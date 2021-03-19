@@ -7,13 +7,13 @@ import util = require('util');
 import os = require('os');
 import bluebird = require('bluebird');
 const lstat = util.promisify(fs.lstat);
-
+const writeFile = util.promisify(fs.writeFile);
 const notInPathError = 'No %s binary could be found in PATH environment variable';
 let _pathesCache: { [tool: string]: string } = {};
 
-export function getDirtyFile(document: vscode.TextDocument): string {
+export async function getDirtyFile(document: vscode.TextDocument): Promise<string> {
   var dirtyFilePath = path.normalize(path.join(os.tmpdir(), 'vscodenimdirty.nim'));
-  fs.writeFileSync(dirtyFilePath, document.getText());
+  await writeFile(dirtyFilePath, document.getText());
   return dirtyFilePath;
 }
 
