@@ -13,8 +13,9 @@ vscode nim extension using LSP server write in nim
 
 ## Requirements
 
-[nimlsp](https://github.com/PMunch/nimlsp) executable can be found in `PATH`
+[nimlsp](https://github.com/bung87/nimlsp) executable can be found in `PATH`
 
+Notice: The linked nimlsp references to my fork version for stablility and more features.  
 
 ## Release Notes
 
