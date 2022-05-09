@@ -8,6 +8,7 @@ import {
   ExecutableOptions,
   HoverParams,
   HoverRequest,
+  RevealOutputChannelOn,
 } from 'vscode-languageclient';
 
 import { showNimVer } from './status';
@@ -54,8 +55,9 @@ async function start(context: any, _: ExecutableInfo) {
       // Notify the server about file changes to '.clientrc files contained in the workspace
       fileEvents: workspace.createFileSystemWatcher('{**/*.nim,**/.nimble}'),
     },
+    revealOutputChannelOn: RevealOutputChannelOn.Never,
     middleware: {
-      provideHover: (
+      provideHover: async (
         document: vscode.TextDocument,
         position: vscode.Position,
         token: vscode.CancellationToken,
@@ -65,12 +67,14 @@ async function start(context: any, _: ExecutableInfo) {
           textDocument: client.code2ProtocolConverter.asTextDocumentIdentifier(document),
           position: client.code2ProtocolConverter.asPosition(start),
         };
-        return client
-          .sendRequest(HoverRequest.type, params, token)
-          .then(client.protocol2CodeConverter.asHover, (error: Error) => {
-            client.logFailedRequest(HoverRequest.type, error);
-            return Promise.reject();
-          });
+        try {
+          const hover = await client.sendRequest(HoverRequest.type, params, token)
+          return client.protocol2CodeConverter.asHover(hover)
+        } catch (e) {
+          let error = e as Error
+          client.logFailedRequest(HoverRequest.type, error);
+          return new vscode.Hover(new vscode.MarkdownString(error.message))
+        }
       },
     },
     // initializationOptions: {
