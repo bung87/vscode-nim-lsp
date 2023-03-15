@@ -17,7 +17,7 @@
     "main": "./out/extension.js",
     "scripts": {
         "format": "prettier --print-width 100 --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma all",
-        "lint": "tslint -p ./ --fix",
+        "lint": "eslint --fix",
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
@@ -28,9 +28,12 @@
         "@types/node": "^18.15.3",
         "@types/vscode": "^1.45.1",
         "@types/which": "^2.0.2",
+        "@typescript-eslint/eslint-plugin": "^5.55.0",
+        "@typescript-eslint/parser": "^5.55.0",
         "@vscode/vsce": "^2.18.0",
+        "eslint": "^8.36.0",
+        "eslint-config-prettier": "^8.7.0",
         "prettier": "^2.8.4",
-        "tslint": "^6.1.3",
         "typescript": "^4.9.5"
     },
     "dependencies": {

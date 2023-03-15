@@ -2,7 +2,7 @@ import vscode = require('vscode');
 import fs = require('fs');
 import path = require('path');
 import { getDirtyFile } from './utils';
-import {promisify} from 'util';
+import { promisify } from 'util';
 const mkdir = promisify(fs.mkdir);
 const stat = promisify(fs.stat);
 
@@ -19,7 +19,7 @@ export async function runFile() {
         'nim ' +
           vscode.workspace.getConfiguration('nim')['buildCommand'] +
           ' -r "' +
-          await getDirtyFile(editor.document) +
+          (await getDirtyFile(editor.document)) +
           '"',
         true,
       );
