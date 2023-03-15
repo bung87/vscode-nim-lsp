@@ -13,11 +13,11 @@ specifiers:
   prettier: ^2.8.4
   typescript: ^4.9.5
   vscode-languageclient: ^8.1.0
-  which: ^2.0.2
+  which: ^3.0.0
 
 dependencies:
   vscode-languageclient: 8.1.0
-  which: 2.0.2
+  which: 3.0.0
 
 devDependencies:
   '@types/bluebird': 3.5.38
@@ -1602,6 +1602,15 @@ packages:
     hasBin: true
     dependencies:
       isexe: 2.0.0
+    dev: true
+
+  /which/3.0.0:
+    resolution: {integrity: sha512-nla//68K9NU6yRiwDY/Q8aU6siKlSs64aEC7+IV56QoAuyQT2ovsJcgGYGyqMOmI/CGN1BOR6mM5EN0FBO+zyQ==}
+    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
+    hasBin: true
+    dependencies:
+      isexe: 2.0.0
+    dev: false
 
   /word-wrap/1.2.3:
     resolution: {integrity: sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ==}
