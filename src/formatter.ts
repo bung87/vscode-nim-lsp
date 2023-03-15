@@ -2,14 +2,14 @@ import vscode = require('vscode');
 import { getBinPath, getDirtyFile } from './utils';
 import cp = require('child_process');
 import fs = require('fs');
-import {promisify} from 'util'
-const stat = promisify(fs.stat)
-const readFile = promisify(fs.readFile)
+import {promisify} from 'util';
+const stat = promisify(fs.stat);
+const readFile = promisify(fs.readFile);
 
 export async function formatDocument(document: vscode.TextDocument):Promise<vscode.TextEdit[] | null | undefined> {
     let file = await getDirtyFile(document);
     let tabSize = null;
-    let maxLineLen = null
+    let maxLineLen = null;
     const config = vscode.workspace.getConfiguration('');
     try {
         tabSize = config['[nim]']['editor.tabSize'];
@@ -17,7 +17,7 @@ export async function formatDocument(document: vscode.TextDocument):Promise<vsco
         tabSize = vscode.workspace.getConfiguration('editor').get('tabSize');
     }
     if (!tabSize) {
-        tabSize = 2
+        tabSize = 2;
     }
 
     try {
@@ -26,7 +26,7 @@ export async function formatDocument(document: vscode.TextDocument):Promise<vsco
         maxLineLen = vscode.workspace.getConfiguration('editor').get('maxLineLen');
     }
     if (!maxLineLen) {
-        maxLineLen = 120
+        maxLineLen = 120;
     }
 
     let args = [
@@ -75,5 +75,5 @@ export async function onSave(e: vscode.TextDocumentWillSaveEvent) {
     if (!onSave) {
         return;
     }
-    await formatDocument(document)
+    await formatDocument(document);
 }
