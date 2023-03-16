@@ -9,7 +9,7 @@ import {
   HoverParams,
   HoverRequest,
   RevealOutputChannelOn,
-} from 'vscode-languageclient';
+} from 'vscode-languageclient/node';
 
 import { showNimVer } from './status';
 import { runFile } from './run';
@@ -18,7 +18,6 @@ import { ExecutableInfo } from './interfaces';
 import { getExecutableInfo, getBinPath } from './utils';
 import { checkFile } from './check';
 import { formatDocument, onSave } from './formatter';
-
 
 export var client: LanguageClient;
 
@@ -68,12 +67,12 @@ async function start(context: any, _: ExecutableInfo) {
           position: client.code2ProtocolConverter.asPosition(start),
         };
         try {
-          const hover = await client.sendRequest(HoverRequest.type, params, token)
-          return client.protocol2CodeConverter.asHover(hover)
+          const hover = await client.sendRequest(HoverRequest.type, params, token);
+          return client.protocol2CodeConverter.asHover(hover);
         } catch (e) {
-          let error = e as Error
-          client.logFailedRequest(HoverRequest.type, error);
-          return new vscode.Hover(new vscode.MarkdownString(error.message))
+          let error = e as Error;
+          client.error(`Request ${HoverRequest.type.method} failed.`, error);
+          return new vscode.Hover(new vscode.MarkdownString(error.message));
         }
       },
     },
@@ -103,7 +102,7 @@ async function start(context: any, _: ExecutableInfo) {
             );
             resolve([]);
           } else {
-            return resolve(formatDocument(document))
+            return resolve(formatDocument(document));
           }
         });
       },
@@ -113,7 +112,7 @@ async function start(context: any, _: ExecutableInfo) {
   context.subscriptions.push(
     vscode.workspace.onWillSaveTextDocument((e) => {
       onSave(e);
-    })
+    }),
   );
 
   // Start the client. This will also launch the server

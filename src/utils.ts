@@ -23,7 +23,7 @@ export async function getBinPath(tool: string): Promise<string> {
   }
   const toolPath = await which(tool);
   if (toolPath) {
-    _pathesCache[tool] = toolPath
+    _pathesCache[tool] = toolPath;
   }
   return _pathesCache[tool];
 }

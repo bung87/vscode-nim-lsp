@@ -9,29 +9,15 @@ export function checkFile() {
     }
     terminal.show(true);
     if (editor.document.isUntitled) {
-     
     } else {
-     
       if (editor.document.isDirty) {
         editor.document.save().then((success: boolean) => {
           if (success) {
-            terminal.sendText(
-              'nim ' +
-                ' check "' +
-                editor?.document.fileName +
-                '"',
-              true,
-            );
+            terminal.sendText('nim ' + ' check "' + editor?.document.fileName + '"', true);
           }
         });
       } else {
-        terminal.sendText(
-          'nim ' +
-            ' check "' +
-            editor.document.fileName +
-            '"',
-          true,
-        );
+        terminal.sendText('nim ' + ' check "' + editor.document.fileName + '"', true);
       }
     }
   }
