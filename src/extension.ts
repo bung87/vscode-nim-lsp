@@ -34,9 +34,9 @@ async function start(context: any, _: ExecutableInfo) {
   // If the extension is launched in debug mode then the debug server options are used
   // Otherwise the run options are used
   let options: ExecutableOptions = {
-    // cwd: folder.uri.fsPath,
-    detached: false,
-    shell: false,
+    // cwd: workspace.workspaceFolders?[0].uri.fsPath
+    // detached: false,
+    // shell: false,
   };
 
   const serverOptions: ServerOptions = {
@@ -47,7 +47,6 @@ async function start(context: any, _: ExecutableInfo) {
   // Options to control the language client
   let clientOptions: LanguageClientOptions = {
     // Register the server for plain text documents
-    // @ts-ignore
     documentSelector: MODE,
     diagnosticCollectionName: 'nim',
     synchronize: {
@@ -76,6 +75,9 @@ async function start(context: any, _: ExecutableInfo) {
         }
       },
     },
+    connectionOptions: {
+      maxRestartCount: 3
+    },
     // initializationOptions: {
     //   documentFormattingProvider: true,
     // },
@@ -85,9 +87,9 @@ async function start(context: any, _: ExecutableInfo) {
     workspaceFolder: workspace.getWorkspaceFolder(resource),
   };
 
+
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);
-
   context.subscriptions.push(
     vscode.languages.registerDocumentFormattingEditProvider(MODE, {
       provideDocumentFormattingEdits: (

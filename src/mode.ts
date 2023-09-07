@@ -5,6 +5,4 @@
 
 'use strict';
 
-import * as vscode from 'vscode';
-
-export const MODE: vscode.DocumentFilter = { language: 'nim', scheme: 'file' };
+export const MODE = [{ language: 'nim', schema: "file" }];

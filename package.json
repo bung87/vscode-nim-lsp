@@ -41,9 +41,6 @@
         "which": "^3.0.0"
     },
     "activationEvents": [
-        "onLanguage:nim",
-        "onLanguage:nimcfg",
-        "onLanguage:nimble",
         "onCommand:nim.build",
         "onCommand:nim.run",
         "onCommand:nim.runTest"
