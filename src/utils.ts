@@ -18,6 +18,10 @@ export async function getDirtyFile(document: vscode.TextDocument): Promise<strin
 }
 
 export async function getBinPath(tool: string): Promise<string> {
+  let configuredExePath = <string>vscode.workspace.getConfiguration("nim").get(tool);
+  if (configuredExePath){
+    return configuredExePath;
+  }
   if (_pathesCache[tool]) {
     return Promise.resolve(_pathesCache[tool]);
   }

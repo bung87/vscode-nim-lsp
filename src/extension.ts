@@ -35,8 +35,8 @@ async function start(context: any, _: ExecutableInfo) {
   // Otherwise the run options are used
   let options: ExecutableOptions = {
     // cwd: workspace.workspaceFolders?[0].uri.fsPath
-    // detached: false,
-    // shell: false,
+    detached: false,
+    shell: false,
   };
 
   const serverOptions: ServerOptions = {
