@@ -33,7 +33,7 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
     exeVersion: string = '';
 
   let configuredExePath = <string>vscode.workspace.getConfiguration("nim").get(exe);
-  console.log(configuredExePath)
+
   if (configuredExePath) {
     exePath = configuredExePath;
   } else {
