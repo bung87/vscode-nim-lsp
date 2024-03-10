@@ -9,7 +9,10 @@
         { "include": "#strings" },
         { "include": "#category" },
         { "include": "#keywords" },
-        { "include": "#text" }
+        { "include": "#text" },
+        {
+          "include": "source.nim"
+        }
     ],
     "repository": {
         "category": {
@@ -36,7 +39,7 @@
                 },
                 {
                     "name": "variable.nimble",
-                    "match": "SkipDirs|SkipFiles|SkipExt|InstallDirs|InstallFiles|InstallExt|srcDir|binDir|bin|backend|requires"
+                    "match": "SkipDirs|SkipFiles|SkipExt|InstallDirs|InstallFiles|InstallExt|srcDir|binDir|bin|namedBin|backend"
                 },
                 {
                     "name": "meta.selector.nimble",
