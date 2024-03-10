@@ -2,7 +2,7 @@
     "name": "vscode-nim-lsp",
     "displayName": "vscode-nim-lsp",
     "description": "",
-    "version": "0.0.23",
+    "version": "0.0.24",
     "publisher": "bung87",
     "engines": {
         "vscode": "^1.45.1"
@@ -59,13 +59,13 @@
                 "configuration": "./nimcfg.json"
             },
             {
-              "id": "nims",
-              "aliases": [ ],
-              "extensions": [
-                  ".nims"
-              ],
-              "configuration": "./nimcfg.json"
-          },
+                "id": "nims",
+                "aliases": [],
+                "extensions": [
+                    ".nims"
+                ],
+                "configuration": "./nimcfg.json"
+            },
             {
                 "id": "nimble",
                 "aliases": [
@@ -85,10 +85,10 @@
                 "path": "./syntaxes/nim.json"
             },
             {
-              "language": "nims",
-              "scopeName": "source.nim",
-              "path": "./syntaxes/nim.json"
-          },
+                "language": "nims",
+                "scopeName": "source.nim",
+                "path": "./syntaxes/nim.json"
+            },
             {
                 "language": "nimble",
                 "scopeName": "source.nimble",
