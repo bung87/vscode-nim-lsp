@@ -25,7 +25,6 @@
         "test-compile": "tsc -p ./"
     },
     "devDependencies": {
-        "@types/bluebird": "^3.5.38",
         "@types/node": "^18.15.3",
         "@types/vscode": "^1.45.1",
         "@types/which": "^2.0.2",
