@@ -5,4 +5,4 @@
 
 'use strict';
 
-export const MODE = [{ language: 'nim', schema: "file" }];
+export const MODE = [{ language: 'nim', schema: 'file' }];

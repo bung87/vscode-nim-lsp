@@ -1,13 +1,15 @@
 import * as vscode from 'vscode';
 import { ExecutableInfo } from './interfaces';
-import fs = require('fs');
 import path = require('path');
 import cp = require('child_process');
 import util = require('util');
 import os = require('os');
 import which = require('which');
+import { text } from 'node:stream/consumers';
+import { stat, writeFile } from 'fs/promises';
 
-const writeFile = util.promisify(fs.writeFile);
+const asyncSpawn = util.promisify(cp.spawn);
+
 const notInPathError = 'No %s binary could be found in PATH environment variable';
 let _pathesCache: { [tool: string]: string } = {};
 
@@ -18,8 +20,8 @@ export async function getDirtyFile(document: vscode.TextDocument): Promise<strin
 }
 
 export async function getBinPath(tool: string): Promise<string> {
-  let configuredExePath = <string>vscode.workspace.getConfiguration("nim").get(tool);
-  if (configuredExePath){
+  let configuredExePath = <string>vscode.workspace.getConfiguration('nim').get(tool);
+  if (configuredExePath) {
     return configuredExePath;
   }
   if (_pathesCache[tool]) {
@@ -36,28 +38,32 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
   var exePath,
     exeVersion: string = '';
 
-  let configuredExePath = <string>vscode.workspace.getConfiguration("nim").get(exe);
+  let configuredExePath = <string>vscode.workspace.getConfiguration('nim').get(exe);
 
   if (configuredExePath) {
     exePath = configuredExePath;
   } else {
     exePath = await getBinPath(exe);
   }
+  const exists = await stat(exePath)
+    .then(() => true)
+    .catch(() => false);
+  if (exePath && exists) {
+    const res = (await asyncSpawn(exePath, ['--version'], {})) as cp.ChildProcess;
+    if (res) {
+      const output = await text(res.stdout!);
+      if (!output) {
+        return Promise.resolve({
+          name: exe,
+          path: exePath,
+        });
+      }
+      let versionOutput = output.toString();
 
-  if (exePath && fs.existsSync(exePath)) {
-    const output = cp.spawnSync(exePath, ['--version']).output;
-    if (!output) {
-      return Promise.resolve({
-        name: exe,
-        path: exePath,
-      });
-    }
-    
-    let versionOutput = output.toString();
-    
-    let versionArgs = /(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/g.exec(versionOutput);
-    if (versionArgs) {
-      exeVersion = versionArgs[0];
+      let versionArgs = /(?:(\d+)\.)?(?:(\d+)\.)?(\*|\d+)/g.exec(versionOutput);
+      if (versionArgs) {
+        exeVersion = versionArgs[0];
+      }
     }
     return Promise.resolve({
       name: exe,

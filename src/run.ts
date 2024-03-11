@@ -1,10 +1,7 @@
-import vscode = require('vscode');
-import fs = require('fs');
+import * as vscode from 'vscode';
 import path = require('path');
 import { getDirtyFile } from './utils';
-import { promisify } from 'util';
-const mkdir = promisify(fs.mkdir);
-const stat = promisify(fs.stat);
+import { stat, mkdir } from 'fs/promises';
 
 var terminal: vscode.Terminal;
 export async function runFile() {

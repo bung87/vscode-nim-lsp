@@ -14,14 +14,15 @@
     "categories": [
         "Other"
     ],
-    "main": "./out/extension.js",
+    "main": "./dist/extension.js",
     "scripts": {
         "format": "prettier --print-width 100 --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma all",
         "lint": "eslint --fix",
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "package": "vsce package --no-dependencies"
+        "vscode:prepublish": "npm run esbuild-base -- --minify",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+        "esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "test-compile": "tsc -p ./"
     },
     "devDependencies": {
         "@types/bluebird": "^3.5.38",
@@ -31,6 +32,7 @@
         "@typescript-eslint/eslint-plugin": "^5.55.0",
         "@typescript-eslint/parser": "^5.55.0",
         "@vscode/vsce": "^2.18.0",
+        "esbuild": "^0.20.1",
         "eslint": "^8.36.0",
         "eslint-config-prettier": "^8.7.0",
         "prettier": "^2.8.4",

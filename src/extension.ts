@@ -1,5 +1,5 @@
 import { workspace } from 'vscode';
-import vscode = require('vscode');
+import * as vscode from 'vscode';
 import { MODE } from './mode';
 import {
   LanguageClient,
@@ -76,7 +76,7 @@ async function start(context: any, _: ExecutableInfo) {
       },
     },
     connectionOptions: {
-      maxRestartCount: 3
+      maxRestartCount: 3,
     },
     // initializationOptions: {
     //   documentFormattingProvider: true,
@@ -86,7 +86,6 @@ async function start(context: any, _: ExecutableInfo) {
     // },
     workspaceFolder: workspace.getWorkspaceFolder(resource),
   };
-
 
   // Create the language client and start the client.
   client = new LanguageClient('nim', 'nim', serverOptions, clientOptions, true);

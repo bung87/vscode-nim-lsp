@@ -1,10 +1,10 @@
-import vscode = require('vscode');
+import * as vscode from 'vscode';
 import { getBinPath, getDirtyFile } from './utils';
 import cp = require('child_process');
-import fs = require('fs');
-import { promisify } from 'util';
-const stat = promisify(fs.stat);
-const readFile = promisify(fs.readFile);
+import util = require('util');
+import { stat, readFile } from 'fs/promises';
+import { text } from 'node:stream/consumers';
+const asyncSpawn = util.promisify(cp.spawn);
 
 export async function formatDocument(
   document: vscode.TextDocument,
@@ -35,14 +35,18 @@ export async function formatDocument(
   args.push('--indent:' + tabSize);
   args.push('--maxLineLen:' + maxLineLen);
   const rootPath = vscode.workspace.getWorkspaceFolder(document.uri)?.uri?.path;
-  let res = cp.spawnSync(await getBinPath('nimpretty'), args.concat(file), {
+  const nimpretty = await getBinPath('nimpretty');
+  let res = (await asyncSpawn(nimpretty, args.concat(file), {
     cwd: rootPath,
-  });
+  })) as cp.ChildProcess;
 
-  if (res.status !== 0) {
-    return Promise.reject(res.error);
+  if (res.exitCode !== 0) {
+    return Promise.reject(await text(res.stdout!));
   } else {
-    if (!(await stat(file))) {
+    const exists = await stat(file)
+      .then(() => true)
+      .catch(() => false);
+    if (!exists) {
       return Promise.reject(file + ' file not found');
     } else {
       let content = await readFile(file, 'utf-8');

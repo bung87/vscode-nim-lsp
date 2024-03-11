@@ -1,4 +1,4 @@
-import vscode = require('vscode');
+import * as vscode from 'vscode';
 
 var terminal: vscode.Terminal;
 export function checkFile() {
