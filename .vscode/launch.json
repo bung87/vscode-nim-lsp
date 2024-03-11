@@ -6,11 +6,11 @@
             "name": "Launch Extension",
             "type": "extensionHost",
             "request": "launch",
-            "runtimeExecutable": "${execPath}",
+            "runtimeExecutable": "out/extension.js",
             "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
             "sourceMaps": true,
             "outFiles": ["${workspaceRoot}/out/src"],
-            "preLaunchTask": "npm: esbuild-watch"
+            "preLaunchTask": "npm: esbuild"
         },
         {
           "name": "Extension Tests",
