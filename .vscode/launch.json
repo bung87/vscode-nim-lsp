@@ -6,10 +6,10 @@
             "name": "Launch Extension",
             "type": "extensionHost",
             "request": "launch",
-            "runtimeExecutable": "out/extension.js",
+            "runtimeExecutable": "${execPath}",
             "args": ["--extensionDevelopmentPath=${workspaceRoot}" ],
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/out/"],
+            "outFiles": ["${workspaceRoot}/dist/*"],
             "preLaunchTask": "npm"
         },
         {
@@ -19,9 +19,9 @@
           "runtimeExecutable": "${execPath}",
           "args": [
             "--extensionDevelopmentPath=${workspaceFolder}",
-            "--extensionTestsPath=${workspaceFolder}/out/test"
+            "--extensionTestsPath=${workspaceFolder}/dist/test"
           ],
-          "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+          "outFiles": ["${workspaceFolder}/dist/test/**/*.js"],
           "preLaunchTask": "npm: test-compile"
         }
     ]

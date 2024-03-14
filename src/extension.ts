@@ -23,7 +23,6 @@ export var client: LanguageClient;
 
 async function start(context: any, _: ExecutableInfo) {
   let serverModule = await getBinPath('nimlsp');
-
   let editor = vscode.window.activeTextEditor;
   if (!editor) {
     return;

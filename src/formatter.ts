@@ -1,10 +1,8 @@
 import * as vscode from 'vscode';
 import { getBinPath, getDirtyFile } from './utils';
-import cp = require('child_process');
-import util = require('util');
 import { stat, readFile } from 'fs/promises';
 import { text } from 'node:stream/consumers';
-const asyncSpawn = util.promisify(cp.spawn);
+import asyncSpawn = require('cross-spawn');
 
 export async function formatDocument(
   document: vscode.TextDocument,
@@ -36,9 +34,9 @@ export async function formatDocument(
   args.push('--maxLineLen:' + maxLineLen);
   const rootPath = vscode.workspace.getWorkspaceFolder(document.uri)?.uri?.path;
   const nimpretty = await getBinPath('nimpretty');
-  let res = (await asyncSpawn(nimpretty, args.concat(file), {
+  let res = asyncSpawn(nimpretty, args.concat(file), {
     cwd: rootPath,
-  })) as cp.ChildProcess;
+  });
 
   if (res.exitCode !== 0) {
     return Promise.reject(await text(res.stdout!));

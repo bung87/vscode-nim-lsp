@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
 import { ExecutableInfo } from './interfaces';
 import path = require('path');
-import cp = require('child_process');
 import util = require('util');
 import os = require('os');
 import which = require('which');
 import { text } from 'node:stream/consumers';
 import { stat, writeFile } from 'fs/promises';
+import asyncSpawn = require('cross-spawn');
 
-const asyncSpawn = util.promisify(cp.spawn);
 
 const notInPathError = 'No %s binary could be found in PATH environment variable';
 let _pathesCache: { [tool: string]: string } = {};
@@ -25,7 +24,7 @@ export async function getBinPath(tool: string): Promise<string> {
     return configuredExePath;
   }
   if (_pathesCache[tool]) {
-    return Promise.resolve(_pathesCache[tool]);
+    return _pathesCache[tool];
   }
   const toolPath = await which(tool);
   if (toolPath) {
@@ -45,11 +44,15 @@ export async function getExecutableInfo(exe: string): Promise<ExecutableInfo> {
   } else {
     exePath = await getBinPath(exe);
   }
+
   const exists = await stat(exePath)
     .then(() => true)
     .catch(() => false);
+
   if (exePath && exists) {
-    const res = (await asyncSpawn(exePath, ['--version'], {})) as cp.ChildProcess;
+    const res = asyncSpawn(exePath, ['--version'], {});
+
+
     if (res) {
       const output = await text(res.stdout!);
       if (!output) {
