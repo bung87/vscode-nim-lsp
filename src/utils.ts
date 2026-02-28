@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import { ExecutableInfo } from './interfaces';
-import path = require('path');
-import util = require('util');
-import os = require('os');
-import which = require('which');
+import path from 'path';
+import util from 'util';
+import os from 'os';
+import which from 'which';
 import { text } from 'node:stream/consumers';
 import { stat, writeFile } from 'fs/promises';
-import asyncSpawn = require('cross-spawn');
+import asyncSpawn from 'cross-spawn';
 
 
 const notInPathError = 'No %s binary could be found in PATH environment variable';

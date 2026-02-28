@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { getBinPath, getDirtyFile } from './utils';
 import { stat, readFile } from 'fs/promises';
 import { text } from 'node:stream/consumers';
-import asyncSpawn = require('cross-spawn');
+import asyncSpawn from 'cross-spawn';
 
 export async function formatDocument(
   document: vscode.TextDocument,

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import path = require('path');
+import path from 'path';
 import { getDirtyFile } from './utils';
 import { stat, mkdir } from 'fs/promises';
 

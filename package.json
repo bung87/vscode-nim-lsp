@@ -20,9 +20,9 @@
         "lint": "eslint --fix",
         "vscode:prepublish": "npm run esbuild-base -- --minify",
         "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
-        "esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
         "tsc-watch": "tsc -watch -p ./ --outDir dist",
-        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "esbuild-watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
         "test-compile": "tsc -p ./ --outDir dist"
     },
     "devDependencies": {
